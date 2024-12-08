@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lista de archivos ZIP</title>
+  <script>
+    // URL de la API de GitHub para obtener los contenidos del repositorio
+    const repoOwner = 'edfh0000';  // Reemplaza con tu nombre de usuario en GitHub
+    const repoName = 'allrepos';  // Reemplaza con el nombre de tu repositorio
+
+    // API para obtener el contenido del repositorio
+    const apiUrl = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/`;
+
+    // Función para obtener los archivos .zip y mostrarlos
+    function cargarArchivos() {
+      fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+          // Filtrar solo los archivos .zip
+          const archivosZip = data.filter(item => item.name.endsWith('.zip'));
+
+          // Obtener el contenedor para los enlaces
+          const listaArchivos = document.getElementById('lista-archivos');
+
+          // Si hay archivos .zip, creamos los enlaces
+          if (archivosZip.length > 0) {
+            archivosZip.forEach(archivo => {
+              const enlace = document.createElement('a');
+              enlace.href = archivo.download_url;  // URL de descarga del archivo
+              enlace.textContent = archivo.name;  // Nombre del archivo
+              enlace.target = '_blank';  // Abrir el enlace en una nueva pestaña
+              const listaItem = document.createElement('li');
+              listaItem.appendChild(enlace);
+              listaArchivos.appendChild(listaItem);
+            });
+          } else {
+            listaArchivos.innerHTML = '<li>No se encontraron archivos .zip.</li>';
+          }
+        })
+        .catch(error => {
+          console.error('Error al obtener los archivos:', error);
+          document.getElementById('lista-archivos').innerHTML = '<li>Error al cargar los archivos.</li>';
+        });
+    }
+
+    // Llamamos a la función para cargar los archivos cuando la página se carga
+    window.onload = cargarArchivos;
+  </script>
+</head>
+<body>
+  <h1>Lista de Repos y Addons</h1>
+  <p>A continuación se muestran los archivos ZIP disponibles para su descarga:</p>
+  <ul id="lista-archivos">
+    <!-- Los enlaces de los archivos .zip se cargarán aquí -->
+  </ul>
+</body>
+</html>
